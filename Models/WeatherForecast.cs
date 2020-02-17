@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace machine_api
+namespace machine_api.Models
 {
     public class WeatherForecast
     {
