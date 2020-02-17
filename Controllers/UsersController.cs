@@ -1,15 +1,17 @@
-﻿using machine_api.Models;
+﻿using AutoMapper;
+using machine_api.Models.User;
 using machine_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace machine_api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
+        /*
         private IUserService _userService;
 
         public UsersController(IUserService userService)
@@ -19,9 +21,9 @@ namespace machine_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]User userParam)
+        public IActionResult Authenticate([FromBody]UserModel userParam)
         {
-            var user = _userService.Authenticate(userParam.Username, userParam.Password);
+            var user = _userService.Authenticate(userParam.Email, userParam.Password);
 
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
@@ -55,6 +57,30 @@ namespace machine_api.Controllers
             }
 
             return Ok(user);
+        }
+        */
+
+        private IUserRepository _userRepository;
+        private IMapper _mapper;
+
+        public UsersController(
+            IUserRepository userRepository,
+            IMapper mapper)
+        {
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("add")]
+        public IActionResult Authenticate([FromBody]RegisterModel model)
+        {
+            // map model to entity
+            var user = _mapper.Map<User>(model);
+
+            _userRepository.AddUser(user, model.Password);
+
+            return Ok(model);
         }
     }
 }

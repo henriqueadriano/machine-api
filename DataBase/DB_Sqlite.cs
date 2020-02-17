@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using machine_api.Models;
+using machine_api.Models.User;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace machine_api.DataBase
+﻿namespace machine_api.DataBase.Queries
 {
-    public interface ICommandText
+    public interface ICommandSQL
     {
         string GetUsers { get; }
         string GetUserById { get; }
@@ -13,22 +8,21 @@ namespace machine_api.DataBase
         string UpdateUser { get; }
         string RemoveUser { get; }
     }
-    public class CommandSQL : ICommandText
+    public class CommandSQL : ICommandSQL
     {
         public string GetUsers => "SELECT * FROM User";
 
         public string GetUserById => "SELECT * FROM User WHERE Id = @Id";
 
         public string AddUser =>  @"INSERT INTO User
-                                    (FirstName,LastName,Email,PasswordHash,PasswordSalt,Token,Role) 
+                                    (FirstName,LastName,Email,PasswordHash,PasswordSalt,Token) 
                                     VALUES(
 	                                    @FirstName,
 	                                    @LastName,
 	                                    @Email,
                                         @PasswordHash,
                                         @PasswordSalt,
-                                        @Token,
-	                                    @Role
+                                        @Token
                                     )";
 
         public string UpdateUser => @"Update User set 

@@ -1,5 +1,6 @@
 ﻿using machine_api.Helpers;
 using machine_api.Models;
+using machine_api.Models.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,6 +12,7 @@ using System.Text;
 
 namespace machine_api.Services
 {
+    /*
     public interface IUserService
     {
         User Authenticate(string username, string password);
@@ -85,4 +87,5 @@ namespace machine_api.Services
             return user;
         }
     }
+    */
 }

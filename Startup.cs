@@ -1,3 +1,5 @@
+using AutoMapper;
+using machine_api.DataBase.Queries;
 using machine_api.Helpers;
 using machine_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace machine_api
@@ -26,6 +29,10 @@ namespace machine_api
             //Congurations for Token Properties on appsettings.json
             var tokenConfigSection = Configuration.GetSection("TokenConfig");
             services.Configure<TokenConfig>(tokenConfigSection);
+
+            //Congurations for Database on appsettings.json
+            var sqliteConn = Configuration.GetSection("DatabaseConn");
+            services.Configure<DatabaseConn>(sqliteConn);
 
             //configure jwt authentication
             var tokenConfig = tokenConfigSection.Get<TokenConfig>();
@@ -48,7 +55,9 @@ namespace machine_api
             });
 
             // configure DI for application services
-            services.AddScoped<IUserService, UserService>();
+            //services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ICommandSQL, CommandSQL>();
 
             /*
              # AddControllers() #
@@ -61,6 +70,7 @@ namespace machine_api
              For the full details of what's included see the source code on GitHub.
              */
             services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

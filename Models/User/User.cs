@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace machine_api.Models
+namespace machine_api.Models.User
 {
     public class User
     {
