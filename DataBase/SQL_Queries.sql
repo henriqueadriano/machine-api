@@ -8,8 +8,9 @@ CREATE TABLE "User" (
 	"PasswordSalt"	BLOB,
 	"Token"	TEXT,
 	"Role"	TEXT NOT NULL,
-	"DateIn"	TEXT NOT NULL DEFAULT (datetime('now'))
-)
+	"DateIn"	TEXT NOT NULL DEFAULT (datetime('now')),
+	"IsActive"	INTEGER DEFAULT 1
+);
 
 SELECT * FROM User
 
@@ -33,7 +34,9 @@ SELECT * FROM User
 
 INSERT INTO User
 (FirstName,LastName,Email,PasswordHash,PasswordSalt,Token,Role) 
-VALUES ('Henrique2','Adriano2','henrique.adriano@gmail.com2',NULL,NULL,NULL,'Admin');
+VALUES 
+('Henrique','Adriano','henrique.adriano@gmail.com',NULL,NULL,NULL,'Admin'),
+('Kelvia','Souza','kelviasouza@gmail.com',NULL,NULL,NULL,'User');
 
 Update User set 
 	FirstName = 'kelvia',

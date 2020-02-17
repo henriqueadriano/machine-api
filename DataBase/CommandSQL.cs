@@ -41,6 +41,8 @@ namespace machine_api.DataBase
 	                                    Role =          @Role 
                                     Where Id =          @Id";
 
-        public string RemoveUser => throw new NotImplementedException();
+        public string RemoveUser => @"  Update User set 
+                                        IsActive = 0
+                                        Where Id = @Id";
     }
 }
