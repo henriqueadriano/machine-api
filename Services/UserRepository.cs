@@ -43,7 +43,10 @@ namespace machine_api.Services
 
         public List<User> GetAllUsers()
         {
-            throw new NotImplementedException();
+            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            {
+                return cnn.Query<User>(_commandSQL.GetUsers).ToList();
+            }
         }
 
         public User GetById(int id)
@@ -63,10 +66,6 @@ namespace machine_api.Services
 
         public User GetByEmail(string email)
         {
-            /*var product = ExecuteCommand<Product>(_connStr, conn =>
-    conn.Query<Product>(_commandText.GetProductById, new { @Id = id }).SingleOrDefault());
-            return product;*/
-
             using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
             {
                 return cnn.Query<User>(_commandSQL.GetByEmail, new { @Email = email }).FirstOrDefault();

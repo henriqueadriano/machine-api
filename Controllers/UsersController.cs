@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using machine_api.Models;
 using machine_api.Models.User;
 using machine_api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -61,14 +62,22 @@ namespace machine_api.Controllers
             return Ok(loggedUser);
         }
 
-        /*
         [Authorize(Roles = Role.Admin)]
-        [HttpGet]
+        [HttpGet("getall")]
         public IActionResult GetAll()
         {
-            var users = _userService.GetAll();
-            return Ok(users);
+            try
+            {
+
+                var users = _userRepository.GetAllUsers();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
-        */
+        
     }
 }
