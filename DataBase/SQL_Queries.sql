@@ -46,3 +46,9 @@ Update User set
 	Token = NULL,
 	Role = 'User' 
 Where Id =6
+
+/*
+https://jasonwatmore.com/post/2019/10/14/aspnet-core-3-simple-api-for-authentication-registration-and-user-management
+https://dapper-tutorial.net/dapper-mapper
+https://jasonwatmore.com/post/2019/10/16/aspnet-core-3-role-based-authorization-tutorial-with-example-api
+*/
