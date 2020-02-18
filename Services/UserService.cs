@@ -1,91 +1,47 @@
 ﻿using machine_api.Helpers;
-using machine_api.Models;
 using machine_api.Models.User;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 
 namespace machine_api.Services
 {
-    /*
     public interface IUserService
     {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
+        User Authenticate(AuthenticateModel model);
+        LoggedUser SetUserToken(User user);
     }
-
     public class UserService : IUserService
     {
-        private List<User> _users = new List<User>
-        {
-            new User { Id = 1, FirstName = "Admin", LastName = "User", Username = "admin", Password = "admin", Role = Role.Admin },
-            new User { Id = 2, FirstName = "Normal", LastName = "User", Username = "user", Password = "user", Role = Role.User }
-        };
+        private IUserRepository _userRepository;
+        private TokenConfig _tokenConfig;
 
-        private readonly TokenConfig _tokenConfig;
-
-        public UserService(IOptions<TokenConfig> tokenConfig)
+        public UserService(
+            IUserRepository userRepository,
+            IOptions<TokenConfig> tokenConfig)
         {
+            _userRepository = userRepository;
             _tokenConfig = tokenConfig.Value;
         }
 
-        public User Authenticate(string username, string password)
+        public User Authenticate(AuthenticateModel model)
         {
-            var user = _users.SingleOrDefault(x => x.Username == username && x.Password == password);
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+                return null;
 
-            // return null if user not found
+            var user = _userRepository.GetByEmail(model.Email);
+
             if (user == null)
                 return null;
 
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_tokenConfig.secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Sid, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            user.Token = tokenHandler.WriteToken(token);
-
-            // remove password before returning
-            user.Password = null;
+            if (!HashSaltPassword.VerifyPasswordHash(model.Password, user.PasswordHash, user.PasswordSalt))
+                return null;
 
             return user;
         }
 
-        public IEnumerable<User> GetAll()
+        public LoggedUser SetUserToken(User user)
         {
-            // return users without passwords
-            return _users.Select(x =>
-            {
-                x.Password = null;
-                return x;
-            });
+            return GenerateToken.AddTokenToUser(user, _tokenConfig.secret);
         }
 
-        public User GetById(int id)
-        {
-            var user = _users.FirstOrDefault(x => x.Id == id);
-
-            // return user without password
-            if (user != null)
-                user.Password = null;
-
-            return user;
-        }
     }
-    */
 }

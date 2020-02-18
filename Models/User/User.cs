@@ -10,8 +10,8 @@ namespace machine_api.Models.User
         public string Email { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public string Token { get; set; }
         public string Role { get; set; }
+        public bool IsActive { get; set; }
         public DateTime DateIn { get; set; }
     }
 }

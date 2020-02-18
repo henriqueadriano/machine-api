@@ -57,7 +57,8 @@ namespace machine_api
             // configure DI for application services
             //services.AddTransient<IUserService, UserService>();
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<ICommandSQL, CommandSQL>();
+            services.AddTransient<ICommandSQL_User, CommandSQL_User>();
+            services.AddTransient<IUserService, UserService>();
 
             /*
              # AddControllers() #

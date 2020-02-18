@@ -1,28 +1,29 @@
 ﻿namespace machine_api.DataBase.Queries
 {
-    public interface ICommandSQL
+    public interface ICommandSQL_User
     {
         string GetUsers { get; }
         string GetUserById { get; }
         string AddUser { get; }
         string UpdateUser { get; }
         string RemoveUser { get; }
+        string GetByEmail { get; }
     }
-    public class CommandSQL : ICommandSQL
+    public class CommandSQL_User : ICommandSQL_User
     {
         public string GetUsers => "SELECT * FROM User";
 
         public string GetUserById => "SELECT * FROM User WHERE Id = @Id";
 
         public string AddUser =>  @"INSERT INTO User
-                                    (FirstName,LastName,Email,PasswordHash,PasswordSalt,Token) 
+                                    (FirstName,LastName,Email,PasswordHash,PasswordSalt,Role) 
                                     VALUES(
 	                                    @FirstName,
 	                                    @LastName,
 	                                    @Email,
                                         @PasswordHash,
                                         @PasswordSalt,
-                                        @Token
+                                        'User'
                                     )";
 
         public string UpdateUser => @"Update User set 
@@ -31,12 +32,13 @@
 	                                    Email =         @Email,
 	                                    PasswordHash =  @PasswordHash,
 	                                    PasswordSalt =  @PasswordSalt,
-	                                    Token =         @Token,
 	                                    Role =          @Role 
                                     Where Id =          @Id";
 
         public string RemoveUser => @"  Update User set 
                                         IsActive = 0
                                         Where Id = @Id";
+
+        public string GetByEmail => @"select * from User where Email = @Email";
     }
 }

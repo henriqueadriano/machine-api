@@ -6,10 +6,9 @@ CREATE TABLE "User" (
 	"Email"	TEXT NOT NULL,
 	"PasswordHash"	BLOB,
 	"PasswordSalt"	BLOB,
-	"Token"	TEXT,
 	"Role"	TEXT NOT NULL,
-	"DateIn"	TEXT NOT NULL DEFAULT (datetime('now')),
-	"IsActive"	INTEGER DEFAULT 1
+	"IsActive"	INTEGER DEFAULT 1,
+	"DateIn"	TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 SELECT * FROM User
