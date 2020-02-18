@@ -20,22 +20,26 @@ namespace machine_api.Services
         List<User> GetAllUsers();
         User GetByEmail(string email);
     }
-    public class UserRepository : IUserRepository
+    public class UserRepositorySQlite : IUserRepository
     {
         private DatabaseConn _databaseConn;
         private readonly ICommandSQL_User _commandSQL;
-        public UserRepository(IOptions<DatabaseConn> databaseConn, 
+        public UserRepositorySQlite(IOptions<DatabaseConn> databaseConn, 
             ICommandSQL_User commandText)
         {
             _databaseConn = databaseConn.Value;
             _commandSQL = commandText;
         }
 
+        public SQLiteConnection SimpleDbConnection()
+        {
+            return new SQLiteConnection(_databaseConn.Sqlite_Conn);
+        }
         public void AddUser(User entity, string password)
         {
             
             User user = HashSaltPassword.CreatePasswordHash(entity,password);
-            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            using (IDbConnection cnn = SimpleDbConnection())
             {
                 cnn.Execute(_commandSQL.AddUser, user);
             }
@@ -43,7 +47,7 @@ namespace machine_api.Services
 
         public List<User> GetAllUsers()
         {
-            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            using (IDbConnection cnn = SimpleDbConnection())
             {
                 return cnn.Query<User>(_commandSQL.GetUsers).ToList();
             }
@@ -51,7 +55,10 @@ namespace machine_api.Services
 
         public User GetById(int id)
         {
-            throw new NotImplementedException();
+            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            {
+                return cnn.Query<User>(_commandSQL.GetUserById, new { @Id = id }).FirstOrDefault();
+            }
         }
 
         public void RemoveUser(int id)

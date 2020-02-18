@@ -5,6 +5,7 @@ using machine_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
 namespace machine_api.Controllers
 {
@@ -51,15 +52,22 @@ namespace machine_api.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AuthenticateModel model)
         {
-            var user = _userService.Authenticate(model);
+            try
+            {
+                var user = _userService.Authenticate(model);
+                if (user == null)
+                    return BadRequest(new { message = "Username or password is incorrect" });
 
-            if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
+                LoggedUser loggedUser = _userService.SetUserToken(user);
+                // return basic user info and authentication token
+                return Ok(loggedUser);
+            }
+            catch (Exception ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
 
-            var loggedUser = _userService.SetUserToken(user);
-
-            // return basic user info and authentication token
-            return Ok(loggedUser);
         }
 
         [Authorize(Roles = Role.Admin)]
@@ -68,9 +76,10 @@ namespace machine_api.Controllers
         {
             try
             {
-
+                // map model to entity
                 var users = _userRepository.GetAllUsers();
-                return Ok(users);
+                var loggedUser = _mapper.Map<IList<LoggedUser>>(users);
+                return Ok(loggedUser);
             }
             catch (Exception ex)
             {
@@ -78,6 +87,33 @@ namespace machine_api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            try
+            {
+                // only allow admins to access other user records
+                var currentUserId = int.Parse(User.Identity.Name);
+                if (id != currentUserId && !User.IsInRole(Role.Admin))
+                    return Forbid();
+
+                var user = _userRepository.GetById(id);
+
+                var loggedUser = _mapper.Map<LoggedUser>(user);
+
+                if (user == null)
+                    return NotFound();
+
+                return Ok(loggedUser);
+            }
+            catch (Exception ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
     }
 }

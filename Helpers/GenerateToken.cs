@@ -32,7 +32,8 @@ namespace machine_api.Helpers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Id = user.Id,
-                Token = tokenString
+                Token = tokenString,
+                Role = user.Role
             };
         }
     }
