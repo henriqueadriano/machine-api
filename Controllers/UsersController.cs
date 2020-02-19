@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace machine_api.Controllers
 {
@@ -34,7 +35,6 @@ namespace machine_api.Controllers
         {
             try
             {
-                // map model to entity
                 var user = _mapper.Map<User>(model);
                 _userRepository.AddUser(user, model.Password);
                 model.Password = null;
@@ -42,7 +42,6 @@ namespace machine_api.Controllers
             }
             catch (Exception ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -59,12 +58,10 @@ namespace machine_api.Controllers
                     return BadRequest(new { message = "Username or password is incorrect" });
 
                 LoggedUser loggedUser = _userService.SetUserToken(user);
-                // return basic user info and authentication token
                 return Ok(loggedUser);
             }
             catch (Exception ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -76,14 +73,12 @@ namespace machine_api.Controllers
         {
             try
             {
-                // map model to entity
                 var users = _userRepository.GetAllUsers();
                 var loggedUser = _mapper.Map<IList<LoggedUser>>(users);
                 return Ok(loggedUser);
             }
             catch (Exception ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -109,10 +104,39 @@ namespace machine_api.Controllers
             }
             catch (Exception ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
 
+        }
+
+        [Authorize(Roles = Role.Admin)]
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                _userRepository.RemoveUser(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update([FromBody]UpdateModel model)
+        {
+            try
+            {
+                var user = _mapper.Map<User>(model);
+                _userRepository.UpdateUser(user);
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = String.Format(CultureInfo.CurrentCulture, ex.Message) });
+            }
         }
 
     }

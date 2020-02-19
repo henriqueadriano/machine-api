@@ -15,7 +15,7 @@ namespace machine_api.Services
     {
         User GetById(int id);
         void AddUser(User entity, string password);
-        void UpdateUser(User entity, int id);
+        void UpdateUser(User entity);
         void RemoveUser(int id);
         List<User> GetAllUsers();
         User GetByEmail(string email);
@@ -63,12 +63,29 @@ namespace machine_api.Services
 
         public void RemoveUser(int id)
         {
-            throw new NotImplementedException();
+            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            {
+                cnn.Query<User>(_commandSQL.RemoveUser, new { @Id = id });
+            }
         }
 
-        public void UpdateUser(User entity, int id)
+        public void UpdateUser(User user)
         {
-            throw new NotImplementedException();
+            var currentUser = GetById(user.Id);
+
+            if (currentUser == null)
+                throw new Exception("User not found!");
+
+            using (IDbConnection cnn = new SQLiteConnection(_databaseConn.Sqlite_Conn))
+            {
+                cnn.Query<User>(_commandSQL.UpdateUser, 
+                    new { 
+                            Id = user.Id,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email
+                    });
+            }
         }
 
         public User GetByEmail(string email)

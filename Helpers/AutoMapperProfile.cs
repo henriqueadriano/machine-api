@@ -7,11 +7,14 @@ namespace machine_api.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User,RegisterModel>();
-            CreateMap<RegisterModel,User>();
+            CreateMap<User, RegisterModel>();
+            CreateMap<RegisterModel, User>();
 
-            CreateMap<User,LoggedUser>();
-            CreateMap<LoggedUser,User>();
+            CreateMap<User, LoggedUser>();
+            CreateMap<LoggedUser, User>();
+
+            CreateMap<User, UpdateModel>();
+            CreateMap<UpdateModel, User>();
         }
     }
 }
