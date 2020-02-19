@@ -1,12 +1,13 @@
 ﻿using machine_api.Helpers;
 using machine_api.Models.User;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace machine_api.Services
 {
     public interface IUserService
     {
-        User Authenticate(AuthenticateModel model);
+        Task<User> Authenticate(AuthenticateModel model);
         LoggedUser SetUserToken(User user);
     }
     public class UserService : IUserService
@@ -22,12 +23,12 @@ namespace machine_api.Services
             _tokenConfig = tokenConfig.Value;
         }
 
-        public User Authenticate(AuthenticateModel model)
+        public async Task<User> Authenticate(AuthenticateModel model)
         {
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return null;
 
-            var user = _userRepository.GetByEmail(model.Email);
+            var user = await _userRepository.GetByEmail(model.Email);
 
             if (user == null)
                 return null;

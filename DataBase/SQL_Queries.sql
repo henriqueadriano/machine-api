@@ -51,4 +51,9 @@ Where Id =6
 https://jasonwatmore.com/post/2019/10/14/aspnet-core-3-simple-api-for-authentication-registration-and-user-management
 https://dapper-tutorial.net/dapper-mapper
 https://jasonwatmore.com/post/2019/10/16/aspnet-core-3-role-based-authorization-tutorial-with-example-api
+https://www.c-sharpcorner.com/article/model-validation-using-data-annotations-in-asp-net-mvc/
+https://blog.maskalik.com/asp-net/sqlite-simple-database-with-dapper/
+https://medium.com/@berkayyerdelen/building-restful-api-with-dapper-and-asp-net-core-37e6d9d1bdda
+https://piotrgankiewicz.com/2017/06/12/asp-net-core-deployment-using-docker-nginx-and-ubuntu-server/
+
 */

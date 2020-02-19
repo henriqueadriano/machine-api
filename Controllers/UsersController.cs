@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace machine_api.Controllers
 {
@@ -31,14 +32,17 @@ namespace machine_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody]RegisterModel model)
+        public async Task<IActionResult> Register([FromBody]RegisterModel model)
         {
             try
             {
                 var user = _mapper.Map<User>(model);
-                _userRepository.AddUser(user, model.Password);
+                var result = await _userRepository.AddUser(user, model.Password);
                 model.Password = null;
-                return Ok(model);
+                if (result > 0)
+                    return Ok(model);
+                else
+                    return BadRequest(new { message = "Error on User Registration!" });
             }
             catch (Exception ex)
             {
@@ -49,11 +53,11 @@ namespace machine_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]AuthenticateModel model)
+        public async Task<IActionResult> Authenticate([FromBody]AuthenticateModel model)
         {
             try
             {
-                var user = _userService.Authenticate(model);
+                var user = await _userService.Authenticate(model);
                 if (user == null)
                     return BadRequest(new { message = "Username or password is incorrect" });
 
@@ -69,13 +73,13 @@ namespace machine_api.Controllers
 
         [Authorize(Roles = Role.Admin)]
         [HttpGet("getall")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var users = _userRepository.GetAllUsers();
-                var loggedUser = _mapper.Map<IList<LoggedUser>>(users);
-                return Ok(loggedUser);
+                var users = await _userRepository.GetAllUsers();
+                var loggedUsers = _mapper.Map<IList<LoggedUser>>(users);
+                return Ok(loggedUsers);
             }
             catch (Exception ex)
             {
@@ -84,7 +88,7 @@ namespace machine_api.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
@@ -93,7 +97,7 @@ namespace machine_api.Controllers
                 if (id != currentUserId && !User.IsInRole(Role.Admin))
                     return Forbid();
 
-                var user = _userRepository.GetById(id);
+                var user = await _userRepository.GetById(id);
 
                 var loggedUser = _mapper.Map<LoggedUser>(user);
 
@@ -111,11 +115,11 @@ namespace machine_api.Controllers
 
         [Authorize(Roles = Role.Admin)]
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _userRepository.RemoveUser(id);
+                await _userRepository.RemoveUser(id);
                 return Ok();
             }
             catch (Exception ex)
@@ -125,12 +129,17 @@ namespace machine_api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update([FromBody]UpdateModel model)
+        public async Task<IActionResult> Update([FromBody]UpdateModel model)
         {
             try
             {
+                // only allow current user to update his own user
+                var currentUserId = int.Parse(User.Identity.Name);
+                if (model.Id != currentUserId && !User.IsInRole(Role.Admin))
+                    return Forbid();
+
                 var user = _mapper.Map<User>(model);
-                _userRepository.UpdateUser(user);
+                await _userRepository.UpdateUser(user);
                 return Ok(model);
             }
             catch (Exception ex)
